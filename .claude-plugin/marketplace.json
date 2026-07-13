@@ -1,0 +1,16 @@
+{
+  "name": "brain-md-marketplace",
+  "description": "brain.md MCP skill for AI agents",
+  "owner": {
+    "name": "njayman"
+  },
+  "plugins": [
+    {
+      "name": "brain-md",
+      "source": "./brain-md",
+      "description": "Search, read, write, and manage notes in a brain.md vault via MCP",
+      "category": "knowledge-management",
+      "keywords": ["brain.md", "notes", "mcp", "knowledge-base", "second-brain"]
+    }
+  ]
+}

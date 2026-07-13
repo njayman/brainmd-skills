@@ -1,0 +1,33 @@
+{
+  "name": "brain-md",
+  "description": "Search, read, write, and manage notes in a brain.md vault via MCP",
+  "version": "1.0.0",
+  "author": {
+    "name": "njayman"
+  },
+  "license": "MIT",
+  "keywords": ["brain.md", "notes", "mcp", "knowledge-base"],
+  "userConfig": {
+    "endpoint": {
+      "type": "string",
+      "title": "brain.md URL",
+      "description": "Base URL of your brain.md instance, e.g. https://brain.example.com",
+      "required": true
+    },
+    "api_token": {
+      "type": "string",
+      "title": "API key or session token",
+      "description": "Leave blank if your instance has no auth configured",
+      "sensitive": true
+    }
+  },
+  "mcpServers": {
+    "brain": {
+      "type": "streamable-http",
+      "url": "${user_config.endpoint}/mcp",
+      "headers": {
+        "Authorization": "Bearer ${user_config.api_token}"
+      }
+    }
+  }
+}
