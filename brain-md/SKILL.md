@@ -133,6 +133,14 @@ Full MCP authorization spec (2025-11-25). PKCE S256 mandatory. For Claude.ai web
 
 For full tool schemas and examples, see [references/tools.md](references/tools.md).
 
+## Token Efficiency
+
+`write_note` overwrites the whole file — no server-side patch tool exists yet. For a large note, every edit round-trips the entire content twice (once in via `read_note`, once out via `write_note`), even for a one-line change. To keep this cheap:
+
+- Don't restate the note's full content in your response text before calling `write_note`/`append_note` — that duplicates the payload (once as prose, once as the tool arg) for no reason. Call the tool directly.
+- Use `append_note` instead of `write_note` whenever the change is purely additive (new entry, closed-out task, journal line) — it skips the read-modify-write round trip entirely.
+- For a note that keeps growing (a running log, a big checklist), split append-only sections into their own note so an edit to one part doesn't require resending the rest.
+
 ## Common Workflows
 
 **Research:** `search_notes` → `similar_notes` → `read_note` → `write_note`
