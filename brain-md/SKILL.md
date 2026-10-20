@@ -9,7 +9,7 @@ description: >
 license: MIT
 metadata:
   author: njayman
-  version: "1.0.0"
+  version: "1.1.0"
   category: knowledge-management
   protocol: mcp
 ---
@@ -139,7 +139,18 @@ For full tool schemas and examples, see [references/tools.md](references/tools.m
 
 - Don't restate the note's full content in your response text before calling `write_note`/`append_note` — that duplicates the payload (once as prose, once as the tool arg) for no reason. Call the tool directly.
 - Use `append_note` instead of `write_note` whenever the change is purely additive (new entry, closed-out task, journal line) — it skips the read-modify-write round trip entirely.
-- For a note that keeps growing (a running log, a big checklist), split append-only sections into their own note so an edit to one part doesn't require resending the rest.
+- **Checklists don't qualify as append-only.** Ticking a checkbox or editing an existing bullet is a modification, not an addition — `append_note` can't do it, so any note with checkboxes you expect to toggle will keep needing full `write_note` round-trips for its entire lifetime, no matter how you write to it initially.
+- **Size is a signal, not just an outcome.** If `read_note` returns something in the tens of KB and you're about to send the same size back via `write_note` for a one-line change, that's the moment to split — not after it's grown further. Waiting until a note is "too big" means paying the round-trip cost every single edit until you finally do the split.
+
+### Pattern: hot/cold note split
+
+A note that both grows over time *and* needs existing lines edited in place (a project tracker, a running status log with checkboxes) will always be expensive under a full-overwrite-only write tool. Instead of one note that gets fully resent on every touch, split by how each part changes:
+
+- **Hot note** (small, edited often): current status only — a short table or a handful of lines that get overwritten frequently. Cheap to round-trip because it stays small by construction.
+- **Cold notes** (append-only, one per phase/entry/day): the detailed narrative — what happened, why, code-level specifics. Write once with `append_note` (or `write_note` on creation) and never touch again once that phase/entry is closed.
+- **Checklist notes** (isolated, edited in place but rarely grow): keep QA/todo checklists in their own note, separate from the hot status note and the cold log. Toggling a box still costs a full round-trip, but at least it's the checklist's size being resent, not the entire log dragged along with it.
+
+Link them with `[[wikilinks]]` from the hot note rather than inlining everything in one file. This is the difference between re-sending a few hundred bytes on every status update versus re-sending an ever-growing multi-KB file every time, which is what happens if status, log, and checklist all live in one note that keeps getting appended to and then re-overwritten.
 
 ## Common Workflows
 

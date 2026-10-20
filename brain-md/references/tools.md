@@ -153,7 +153,7 @@ Returns: Matching task items with similarity scores.
 
 ### write_note
 
-Create or overwrite a note.
+Create or overwrite a note. There is no partial-edit/patch variant — `content` always replaces the entire note body. For an existing note, that means `read_note` first, then send the whole modified body back, even for a one-line change. See [Token Efficiency](../SKILL.md#token-efficiency) for how to avoid this getting expensive on large or frequently-updated notes.
 
 ```json
 {
