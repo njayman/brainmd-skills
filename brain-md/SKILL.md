@@ -174,6 +174,7 @@ Link them with `[[wikilinks]]` from the hot note rather than inlining everything
 | `401` after restart | In-memory tokens cleared | Use API keys (persisted) |
 | `404` | Note path doesn't exist | Use `list_notes` to find path |
 | Rate limit | Too many requests | Add delay between calls |
+| Semantic tool fails / empty | RAG disabled or index stale | Check `GET /api/rag/status`; fall back to `search_notes` |
 
 **Token TTLs:**
 - Session tokens (V53): 24h
